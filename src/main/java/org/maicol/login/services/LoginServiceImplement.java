@@ -14,8 +14,10 @@ public class LoginServiceImplement implements LoginService {
         HttpSession session = request.getSession();
         String username = (String) session.getAttribute("username");
         if(username!=null){
+            //retornamos el nombre del usuario
             return Optional.of(username);
         }
+        //retorna vacio
         return Optional.empty();
     }
 

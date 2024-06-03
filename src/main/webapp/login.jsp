@@ -12,7 +12,7 @@
 </head>
 <body>
 <h1>Iniciar sesion</h1>
-<form action="Login" method="post"></form>
+<form action="Login" method="post">
 <div>
     <label for="username">Ingrese el nombre del usuario</label>
     <input type="text" name="username" id="username">
@@ -24,6 +24,7 @@
 <div>
     <input type="submit" value="Login">
 </div>
+</form>
 
 </body>
 </html>
