@@ -16,7 +16,7 @@ import java.io.PrintWriter;
 import java.util.Optional;
 
 //creamos el Path para la conexion al Servlet
-@WebServlet({"/Login", "/LoginServlet"})
+@WebServlet({"/Login", "/ServletLogin"})
 public class ServletLogin extends HttpServlet {
     final static String USERNAME="admin";
     final static String PASSWORD="12345";
@@ -35,20 +35,21 @@ public class ServletLogin extends HttpServlet {
                 out.print("<!DOCTYPE html>");
                 out.print("<html>");
                 out.print("<head>");
+                out.print("<title>Inicio de sesión</title>");
+                out.print("<link rel='stylesheet' type='text/css' href='styles.css'>");
+                out.print("</head>");
                 out.print("</head>");
                 out.print("<body>");
                 out.print("<h3> Hola " + usernameOptional.get() + "has inciado sesion con exito</h3>");
                 out.println("<p><a href='" + request.getContextPath() + "/index.html'>Volver</a></p>");
-                out.println("<p><a href='" + request.getContextPath() + "/logout>Cerrar Sesion</a></p>");
+                out.println("<p><a href='" + request.getContextPath() + "/logout'>Cerrar Sesion</a></p>");
                 out.print("</body>");
                 out.print("</html>");
             }
         }else {
             getServletContext().getRequestDispatcher("/login.jsp").forward(request,response);
         }
-
     }
-
     @Override
     protected void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username=request.getParameter("username");
@@ -57,13 +58,11 @@ public class ServletLogin extends HttpServlet {
         if(USERNAME.equals(username) && PASSWORD.equals(password)){
             HttpSession session=request.getSession();
             session.setAttribute("username",username);
-            response.sendRedirect(request.getContextPath()+"/LoginServlet");
+            response.sendRedirect(request.getContextPath()+"/ServletLogin");
         }else{
     response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Lo sentimos no esta autorizado para ingresar al sistema");
         }
     }
-
-
 }
 
 

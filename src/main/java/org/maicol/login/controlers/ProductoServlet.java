@@ -16,8 +16,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
 
-import static java.lang.System.out;
-
 @WebServlet({"/productoServlet", "/productos"})
 public class ProductoServlet extends HttpServlet {
 
@@ -25,46 +23,58 @@ public class ProductoServlet extends HttpServlet {
         ProductoService service = new ProductoServiceImplement();
         List<Producto> productos = service.listar();
         LoginService auth= new LoginServiceImplement();
-        //validadando que el usuario exista
         Optional<String> usernameOptional = auth.getUsername(request);
 
-        try (PrintWriter out= response.getWriter()){
+        response.setContentType("text/html;charset=UTF-8");
+
+        try (PrintWriter out = response.getWriter()) {
             out.print("<!DOCTYPE html>");
-            out.print("<html>");
+            out.print("<html lang='en'>");
             out.print("<head>");
+            out.print("<meta charset='UTF-8'>");
+            out.print("<title>Listado de Productos</title>");
+            out.print("<link rel='stylesheet' href='styles.css'>");
             out.print("</head>");
             out.print("<body>");
-            out.print("<h1>Listado productos </h1>");
-            if(usernameOptional.isPresent()){
-                out.print("<div style= 'color:blue;'> Hola "+ usernameOptional.get()+" Bienvenido");
-            }
-            out.print("<table>");
-            out.print("<tr>");
-            out.print("<th> id</th>");
-            out.print("<th> Nombre </th>");
-            out.print("<th> Categoria </th>");
-            out.print("<th> Descripcion </th>");
+            out.print("<div class='container'>");
+            out.print("<h3>Listado de Productos</h3>");
+            out.print("<ul>");
+            out.print("<li><a href='/Login_war_exploded/ServletLogin'>Regresar</a></li>");
+            out.print("</ul>");
+
             if(usernameOptional.isPresent()) {
-                out.print("<th> Precio </th>");
+                out.print("<div style='color:blue;'>Hola " + usernameOptional.get() + ", Bienvenido</div>");
+            }
+
+            out.print("<table>");
+            out.print("<thead>");
+            out.print("<tr>");
+            out.print("<th>Id</th>");
+            out.print("<th>Nombre</th>");
+            out.print("<th>Categoría</th>");
+            out.print("<th>Descripción</th>");
+            if (usernameOptional.isPresent()) {
+                out.print("<th>Precio</th>");
             }
             out.print("</tr>");
-            productos.forEach(p ->{
+            out.print("</thead>");
+            out.print("<tbody>");
+            for (Producto p : productos) {
                 out.print("<tr>");
-                out.print("<td>"+ p.getIdProducto() +"</td>");
-                out.print("<td>"+ p.getNombre() +"</td>");
-                out.print("<td>"+ p.getCategoria() +"</td>");
-                out.print("<td>"+ p.getDescripcion() +"</td>");
-                out.print("<td>"+ p.getPrecio() +"</td>");
+                out.print("<td>" + p.getIdProducto() + "</td>");
+                out.print("<td>" + p.getNombre() + "</td>");
+                out.print("<td>" + p.getCategoria() + "</td>");
+                out.print("<td>" + p.getDescripcion() + "</td>");
+                if (usernameOptional.isPresent()) {
+                    out.print("<td>" + p.getPrecio() + "</td>");
+                }
                 out.print("</tr>");
-
-            });
-
+            }
+            out.print("</tbody>");
             out.print("</table>");
-            response.setContentType("text/html;charset UTF-8");
-
+            out.print("</div>");
             out.print("</body>");
             out.print("</html>");
         }
     }
 }
-
