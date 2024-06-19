@@ -4,18 +4,30 @@ import org.maicol.login.models.Producto;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class ProductoServiceImplement implements ProductoService {
     //sobreescribimos el metodo
     @Override
 
     public List<Producto> listar(){
-        return Arrays.asList(new Producto(1,"Laptop","Computacion","HP i7",650.25),
-                new Producto(2,"Mouse","Computacion", "Gamer",20.50),
-                new Producto(3,"TV","Electrodomestico","55 Pulgadas",500.30));
-
-
-
+        return Arrays.asList();
        }
+
+    @Override
+    public Optional<Producto> porId(Integer id) {
+
+        return listar().stream().filter(p-> p.getIdProducto().equals(id)).findAny();
+    }
+
+    @Override
+    public void guardar(Producto producto) {
+
+    }
+
+    @Override
+    public void eliminar(Integer id) {
+
+    }
 
 }

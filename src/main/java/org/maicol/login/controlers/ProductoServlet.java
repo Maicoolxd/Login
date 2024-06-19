@@ -6,13 +6,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.maicol.login.models.Producto;
-import org.maicol.login.services.LoginService;
-import org.maicol.login.services.LoginServiceImplement;
-import org.maicol.login.services.ProductoService;
-import org.maicol.login.services.ProductoServiceImplement;
+import org.maicol.login.repositories.ProductoRepositoryJdbcImpl;
+import org.maicol.login.services.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +19,10 @@ import java.util.Optional;
 public class ProductoServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        ProductoService service = new ProductoServiceImplement();
+
+        Connection conn = (Connection) request.getAttribute("conn");
+        ProductoService service = new ProductoServiceJdbcImplement(conn);
+
         List<Producto> productos = service.listar();
         LoginService auth= new LoginServiceImplement();
         Optional<String> usernameOptional = auth.getUsername(request);
@@ -39,7 +41,7 @@ public class ProductoServlet extends HttpServlet {
             out.print("<div class='container'>");
             out.print("<h3>Listado de Productos</h3>");
             out.print("<ul>");
-            out.print("<li><a href='/Login_war_exploded/ServletLogin'>Regresar</a></li>");
+            out.println("<input type=\"button\" value=\"Regresar\" class=\"btn\" onclick=\"window.history.back()\"/>");
             out.print("</ul>");
 
             if(usernameOptional.isPresent()) {
@@ -49,10 +51,14 @@ public class ProductoServlet extends HttpServlet {
             out.print("<table>");
             out.print("<thead>");
             out.print("<tr>");
-            out.print("<th>Id</th>");
+            out.print("<th>IdArticulo</th>");
+            out.print("<th>IdCodigo</th>");
             out.print("<th>Nombre</th>");
-            out.print("<th>Categoría</th>");
-            out.print("<th>Descripción</th>");
+            out.print("<th>Stock</th>");
+            out.print("<th>Categoria</th>");
+            out.print("<th>Descripcion</th>");
+            out.print("<th>Imagen</th>");
+            out.print("<th>Condicion</th>");
             if (usernameOptional.isPresent()) {
                 out.print("<th>Precio</th>");
             }
@@ -62,11 +68,21 @@ public class ProductoServlet extends HttpServlet {
             for (Producto p : productos) {
                 out.print("<tr>");
                 out.print("<td>" + p.getIdProducto() + "</td>");
+                out.print("<td>" + p.getCodigo() + "</td>");
                 out.print("<td>" + p.getNombre() + "</td>");
+                out.print("<td>" + p.getStock() + "</td>");
                 out.print("<td>" + p.getCategoria() + "</td>");
                 out.print("<td>" + p.getDescripcion() + "</td>");
+                out.print("<td>" + p.getImagen() + "</td>");
+                out.print("<td>" + p.getCondicion() + "</td>");
+
                 if (usernameOptional.isPresent()) {
-                    out.print("<td>" + p.getPrecio() + "</td>");
+                    out.println("<td>" + p.getPrecio() + "</td>");
+                    out.println("<td><a href=\""
+                            + request.getContextPath()
+                            +"/agregar-carro?id="
+                            + p.getIdProducto()
+                            +"\"> agregar al carro </a></td>");
                 }
                 out.print("</tr>");
             }
