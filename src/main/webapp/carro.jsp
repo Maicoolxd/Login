@@ -13,7 +13,7 @@
     <title>Carro de compras</title>
 </head>
 <body>
-    <h1>Carro de compras</h1>
+    <h1>Carro de compras de adidas</h1>
 
     <%if(carro==null || carro.getItems().isEmpty()){%>
     <p>Lo sentios no hay productos en el carro de compras</p>
