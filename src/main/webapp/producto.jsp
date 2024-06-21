@@ -35,6 +35,7 @@
 
     <% if (usernameOptional.isPresent()) { %>
     <div style="color:blue;">Hola <%= usernameOptional.get() %>, Bienvenido</div>
+    <p><a href="<%=request.getContextPath()%>/crearProducto.jsp">Nuevo Producto</a></p>
     <% } %>
 
     <table>
