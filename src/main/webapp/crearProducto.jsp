@@ -10,7 +10,7 @@
     List<Categoria> categorias = (List<Categoria>)  request.getAttribute("categorias");
     Map<String, String> errores = (Map<String, String>) request.getAttribute("errores");
     Producto producto = (Producto) request.getAttribute("producto");
-%>Z
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,20 +20,38 @@
 </head>
 <body>
 <div class="container">
-    <h3>Crear Producto</h3>
+    <h3>Formulario Producto</h3>
     <form action="<%= request.getContextPath() %>/crearProducto.jsp" method="post">
         <label for="codigo">Codigo:</label>
         <input type="text" id="codigo" name="codigo" required><br>
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required><br>
+
+        <%
+            if(errores != null && errores.containsKey("nombre")){%>
+            <div style="color: red;" <%errores.get("nombre");%> ></div>
+        <%}%>
         <label for="stock">Stock:</label>
         <input type="number" id="stock" name="stock" required><br>
         <label for="categoria">Categoria</label>
         <select id="categoria" name="categoria" required>
-                    <option value="">---Seleccionar---</option>
-                    <% for (Categoria c: categorias){ %>
-                    <option value="<%=c.getIdCategoria()%>"><%=c.getNombre()%></option><% } %>
-         </select><br>
+            <%
+                if (categorias != null && !categorias.isEmpty()) {
+                    for (Categoria categoria : categorias) {
+            %>
+            <option value="<%= categoria.getIdCategoria() %>"
+                    <%= producto != null && producto.getCategoria().getIdCategoria() == categoria.getIdCategoria() ? "selected" : "" %>>
+                <%= categoria.getNombre() %></option>
+            <%
+                }
+            } else {
+            %>
+            <option value="">No hay categorías disponibles</option>
+            <%
+                }
+            %></select>
+
+
 
         <label for="descripcion">Descripción:</label>
         <textarea id="descripcion" name="descripcion" required></textarea><br>
@@ -44,7 +62,10 @@
         <label for="precio">Precio:</label>
         <input type="number" step="0.01" id="precio" name="precio" required><br>
         <br>
-        <input type="submit" value="Crear Producto">
+
+        <input type="submit" value="<%= (producto != null && producto.getIdProducto() != null && producto.getIdProducto() > 0) ? "Editar" : "Crear" %>">
+
+        <input type="hidden" name="id" value="<%= (producto != null) ? producto.getIdProducto() : "" %>">
     </form>
 </div>
 </body>
