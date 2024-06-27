@@ -11,6 +11,7 @@ public class Conexion {
     private static String url ="jdbc:mysql://localhost:3306/mydb";
     private static String username = "root";
     private static String password = "";
+
     //genera el driver y llama a los parametros
     public static  Connection getConecction() throws SQLException{
         return DriverManager.getConnection(url,username,password);

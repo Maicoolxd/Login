@@ -61,14 +61,16 @@
             <td><%= p.getCodigo() %></td>
             <td><%= p.getNombre() %></td>
             <td><%= p.getStock() %></td>
-            <td><%= p.getCategoria() %></td>
+            <td><%= p.getCategoria().getIdCategoria() %></td>
             <td><%= p.getDescripcion() %></td>
             <td><%= p.getImagen() %></td>
             <td><%= p.getCondicion() %></td>
 
             <% if (usernameOptional.isPresent()) { %>
             <td><%= p.getPrecio() %></td>
-            <td><a href="<%= request.getContextPath() %>/agregar-carro?id=<%= p.getIdProducto() %>">agregar al carro</a></td>
+            <td><a href="<%= request.getContextPath() %>/agregar-carro?id=<%= p.getIdProducto() %>">agregar al carro</a>
+            <a href="<%= request.getContextPath() %>/editarProducto.jsp?id=<%= p.getIdProducto() %>">Editar</a>
+            <a href="<%= request.getContextPath() %>/EliminarProductoServlet?id=<%= p.getIdProducto() %>">Eliminar</a></td>
             <% } %>
         </tr>
         <% } %>

@@ -14,6 +14,11 @@ public class CategoriaRepositoryJdbcImplement implements Repository <Categoria> 
     }
 
     @Override
+    public Connection getConnection() throws SQLException {
+        return this.conn;
+    }
+
+    @Override
     public List<Categoria> listar() throws SQLException {
         List<Categoria> categorias = new ArrayList<>();
         try (Statement stmt = conn.createStatement()) {
@@ -28,7 +33,7 @@ public class CategoriaRepositoryJdbcImplement implements Repository <Categoria> 
     @Override
     public Categoria porId(Integer id) throws SQLException {
         Categoria categoria =  null;
-        try (PreparedStatement stmt = conn.prepareStatement("select * from categoria WHERE idcategoria=?")) {
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM categoria WHERE idcategoria = ?")) {
             stmt.setInt(1,id);
             try(ResultSet rs = stmt.executeQuery()){
                 if(rs.next()){
@@ -41,7 +46,26 @@ public class CategoriaRepositoryJdbcImplement implements Repository <Categoria> 
 
     @Override
     public void guardar(Categoria categoria) throws SQLException {
+        String sql = "INSERT INTO categoria (nombre, descripcion, condicion) VALUES (?, ?, ?)";
 
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, categoria.getNombre());
+            pstmt.setString(2, categoria.getDescripcion());
+            pstmt.setInt(3, categoria.getCondicion());
+
+            int filasAfectadas = pstmt.executeUpdate();
+            if (filasAfectadas == 0) {
+                throw new SQLException("No se pudo insertar la categoría, ninguna fila afectada.");
+            }
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    categoria.setIdCategoria(generatedKeys.getInt(1));
+                } else {
+                    throw new SQLException("No se pudo obtener el ID generado para la categoría.");
+                }
+            }
+        }
     }
 
     @Override

@@ -1,16 +1,27 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: USUARIO
-  Date: 20/6/2024
-  Time: 8:59
-  To change this template use File | Settings | File Templates.
---%>
+<%@ page import="java.util.List" %>
+<%@ page import="org.maicol.login.models.Categoria" %>
+<%@ page import="org.maicol.login.repositories.CategoriaRepositoryJdbcImplement" %>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="org.maicol.login.repositories.CategoriaRepositoryJdbcImplement" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" import="java.util.*, org.maicol.login.models.*"%>
 <%
-    List<Categoria> categorias = (List<Categoria>)  request.getAttribute("categorias");
-    Map<String, String> errores = (Map<String, String>) request.getAttribute("errores");
-    Producto producto = (Producto) request.getAttribute("producto");
+    Connection conn = (Connection) request.getAttribute("conn");
+    if (conn == null) {
+        conn = (Connection) session.getAttribute("conn");
+    }
+
+    if (conn == null) {
+        throw new NullPointerException("Conexión a la base de datos es nula.");
+    }
+
+    CategoriaRepositoryJdbcImplement categoriaService = new CategoriaRepositoryJdbcImplement(conn);
+    List<Categoria> categorias = categoriaService.listar();
+
+    if (categorias == null) {
+        throw new NullPointerException("La lista de categorías es nula.");
+    }
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,54 +30,48 @@
     <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css">
 </head>
 <body>
-<div class="container">
-    <h3>Formulario Producto</h3>
-    <form action="<%= request.getContextPath() %>/crearProducto.jsp" method="post">
-        <label for="codigo">Codigo:</label>
-        <input type="text" id="codigo" name="codigo" required><br>
+<h3>Crear Producto</h3>
+<form action="<%= request.getContextPath() %>/agregarProducto" method="post">
+    <div>
+        <label for="codigo">Código:</label>
+        <input type="text" id="codigo" name="codigo" required>
+    </div>
+    <div>
         <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" required><br>
-
-        <%
-            if(errores != null && errores.containsKey("nombre")){%>
-            <div style="color: red;" <%errores.get("nombre");%> ></div>
-        <%}%>
+        <input type="text" id="nombre" name="nombre" required>
+    </div>
+    <div>
         <label for="stock">Stock:</label>
-        <input type="number" id="stock" name="stock" required><br>
-        <label for="categoria">Categoria</label>
+        <input type="number" id="stock" name="stock" required>
+    </div>
+    <div>
+        <label for="categoria">Categoría:</label>
         <select id="categoria" name="categoria" required>
-            <%
-                if (categorias != null && !categorias.isEmpty()) {
-                    for (Categoria categoria : categorias) {
-            %>
-            <option value="<%= categoria.getIdCategoria() %>"
-                    <%= producto != null && producto.getCategoria().getIdCategoria() == categoria.getIdCategoria() ? "selected" : "" %>>
-                <%= categoria.getNombre() %></option>
-            <%
-                }
-            } else {
-            %>
-            <option value="">No hay categorías disponibles</option>
-            <%
-                }
-            %></select>
-
-
-
+            <% for (Categoria categoria : categorias) { %>
+            <option value="<%= categoria.getIdCategoria() %>"><%= categoria.getNombre() %></option>
+            <% } %>
+        </select>
+    </div>
+    <div>
         <label for="descripcion">Descripción:</label>
-        <textarea id="descripcion" name="descripcion" required></textarea><br>
+        <input type="text" id="descripcion" name="descripcion" required>
+    </div>
+    <div>
         <label for="imagen">Imagen:</label>
-        <input type="text" id="imagen" name="imagen" required><br>
+        <input type="text" id="imagen" name="imagen" required>
+    </div>
+    <div>
         <label for="condicion">Condición:</label>
-        <input type="text" id="condicion" name="condicion" required><br>
+        <input type="number" id="condicion" name="condicion" required>
+    </div>
+    <div>
         <label for="precio">Precio:</label>
-        <input type="number" step="0.01" id="precio" name="precio" required><br>
-        <br>
+        <input type="number" id="precio" name="precio" required>
+    </div>
 
-        <input type="submit" value="<%= (producto != null && producto.getIdProducto() != null && producto.getIdProducto() > 0) ? "Editar" : "Crear" %>">
-
-        <input type="hidden" name="id" value="<%= (producto != null) ? producto.getIdProducto() : "" %>">
-    </form>
-</div>
+    <div>
+        <input type="submit" value="Crear Producto">
+    </div>
+</form>
 </body>
 </html>

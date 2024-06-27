@@ -4,17 +4,17 @@ public class Categoria {
     private Integer idCategoria;
     private String nombre;
     private String descripcion;
-    private Integer condicion;
+    private int condicion;
 
     public Categoria() {
 
     }
-
-    public Categoria(Integer idCategoria, String nombre, String descripcion, Integer condicion) {
+    public Categoria(Integer idCategoria, String nombre) {
         this.idCategoria = idCategoria;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.condicion = condicion;
+
     }
 
     public Integer getIdCategoria() {
@@ -41,11 +41,11 @@ public class Categoria {
         this.descripcion = descripcion;
     }
 
-    public Integer getCondicion() {
+    public int getCondicion() {
         return condicion;
     }
 
-    public void setCondicion(Integer condicion) {
+    public void setCondicion(int condicion) {
         this.condicion = condicion;
     }
 }

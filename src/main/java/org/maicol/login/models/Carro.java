@@ -36,4 +36,10 @@ public class Carro {
     public double getTotal(){
         return items.stream().mapToDouble(ItemCarro::getImporte).sum();
     }
+
+    public void eliminarItem(int idProducto) {
+    }
+
+    public void actualizarCantidad(int idProducto, int cantidad) {
+    }
 }

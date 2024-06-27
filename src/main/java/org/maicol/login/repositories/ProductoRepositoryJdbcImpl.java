@@ -13,12 +13,15 @@ public class ProductoRepositoryJdbcImpl implements Repository<Producto>{
     public ProductoRepositoryJdbcImpl(Connection conn) {
         this.conn = conn;
     }
+    public Connection getConnection() throws SQLException {
+        return this.conn;
+    }
 
     @Override
     public List<Producto> listar() throws SQLException {
         List<Producto> productos = new ArrayList<>();
         try(Statement smt = conn.createStatement();
-                ResultSet rs = smt.executeQuery("SELECT articulo.idarticulo,categoria.nombre AS nombre_categoria,articulo.idcategoria,articulo.codigo,articulo.nombre,articulo.stock, articulo.descripcion,articulo.imagen,articulo.condicion,articulo.precio FROM articulo INNER JOIN categoria ON articulo.idcategoria = categoria.idcategoria;")){
+                ResultSet rs = smt.executeQuery("SELECT *from articulo")){
             while(rs.next()){
                 Producto p = getProducto(rs);
                 productos.add(p);
@@ -30,10 +33,16 @@ public class ProductoRepositoryJdbcImpl implements Repository<Producto>{
     @Override
     public Producto porId(Integer id) throws SQLException {
         Producto producto = null;
-        try (PreparedStatement smt = conn.prepareStatement("SELECT  p.*, c.nombre AS categoria FROM articulo AS p INNER JOIN categoria AS c ON p.idcategoria = c.idcategoria WHERE p.idarticulo=?;")){
-            smt.setInt(1,id);
-            try (ResultSet rs= smt.executeQuery()){
-                if (rs.next()){
+        try (PreparedStatement smt = conn.prepareStatement(
+                "SELECT p.*, categoria.nombre \n" +
+                        "FROM articulo AS p \n" +
+                        "INNER JOIN categoria ON categoria.idcategoria = p.idcategoria \n" +
+                        "WHERE p.idarticulo = ?;\n")) {
+
+
+            smt.setInt(1, id);
+            try (ResultSet rs = smt.executeQuery()) {
+                if (rs.next()) {
                     producto = getProducto(rs);
                 }
             }
@@ -44,24 +53,47 @@ public class ProductoRepositoryJdbcImpl implements Repository<Producto>{
     @Override
     public void guardar(Producto producto) throws SQLException {
         String sql;
-        if(producto.getIdProducto() != null & producto.getIdProducto()>0){
-            sql= "UPDATE articulo SET nombre=?, categoria=?, descripcion=?, precio=? WHERE idarticulo=?";
-        }else {
-            sql ="INSERT INTO articulo (nombre, categoria, descripcion, precio, condicion) VALUES (?,?,?,?,1)";
+        if (producto.getIdProducto() != null && producto.getIdProducto() > 0) {
+            // Actualizar producto existente
+            sql = "UPDATE articulo SET codigo=?, nombre=?, stock=?, idcategoria=?, descripcion=?, imagen=?, condicion=?, precio=? WHERE idarticulo=?";
+        } else {
+            // Insertar nuevo producto
+            sql = "INSERT INTO articulo (codigo, nombre, stock, idcategoria, descripcion, imagen, condicion, precio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         }
-        try(PreparedStatement smt = conn.prepareStatement(sql)){
-            smt.setString(1,producto.getNombre());
-            smt.setInt(2,producto.getCategoria().getIdCategoria());
-            smt.setString(3,producto.getDescripcion());
-            smt.setDouble(4,producto.getPrecio());
-            if(producto.getIdProducto() != null && producto.getIdProducto()>0){
-                smt.setInt(5,producto.getIdProducto());
-            }//else {
-                //smt.setDate(5, Date.valueOf(producto.getFecha()));
-            // }
-            smt.executeUpdate();
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, producto.getCodigo());
+            pstmt.setString(2, producto.getNombre());
+            pstmt.setInt(3, producto.getStock());
+            pstmt.setInt(4, producto.getCategoria().getIdCategoria());
+            pstmt.setString(5, producto.getDescripcion());
+            pstmt.setString(6, producto.getImagen());
+            pstmt.setInt(7, producto.getCondicion());
+            pstmt.setDouble(8, producto.getPrecio());
+
+            if (producto.getIdProducto() != null && producto.getIdProducto() > 0) {
+                // Setear el ID del producto para la cláusula WHERE en la actualización
+                pstmt.setInt(9, producto.getIdProducto());
+            }
+
+            int filasAfectadas = pstmt.executeUpdate();
+            if (filasAfectadas == 0) {
+                throw new SQLException("No se pudo guardar el producto, ninguna fila afectada.");
+            }
+
+            if (producto.getIdProducto() == null || producto.getIdProducto() == 0) {
+                // Obtener el ID generado si es una inserción nueva
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        producto.setIdProducto(generatedKeys.getInt(1));
+                    } else {
+                        throw new SQLException("No se pudo obtener el ID generado para el producto.");
+                    }
+                }
+            }
         }
     }
+
 
     @Override
     public void eliminar(Integer id) throws SQLException {
@@ -88,11 +120,18 @@ public class ProductoRepositoryJdbcImpl implements Repository<Producto>{
         p.setIdProducto(rs.getInt("idarticulo"));
         p.setCodigo(rs.getInt("codigo"));
         p.setNombre(rs.getString("nombre"));
-        p.setDescripcion(rs.getString("descripcion"));
-        p.setCondicion(rs.getInt("condicion"));
         p.setStock(rs.getInt("stock"));
+        p.setDescripcion(rs.getString("descripcion"));
         p.setImagen(rs.getString("imagen"));
-        p.setPrecio(rs.getInt("precio"));
+        p.setCondicion(rs.getInt("condicion"));
+        p.setPrecio(rs.getDouble("precio"));
+
+        Categoria c = new Categoria();
+        c.setIdCategoria(rs.getInt("idcategoria"));
+        c.setNombre(rs.getString("nombre"));
+        p.setCategoria(c);
+
         return p;
     }
+
 }

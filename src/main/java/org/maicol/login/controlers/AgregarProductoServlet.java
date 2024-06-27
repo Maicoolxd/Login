@@ -9,32 +9,20 @@ import org.maicol.login.models.Categoria;
 import org.maicol.login.models.Producto;
 import org.maicol.login.services.ProductoService;
 import org.maicol.login.services.ProductoServiceJdbcImplement;
-import org.maicol.login.services.LoginService;
-import org.maicol.login.services.LoginServiceImplement;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.util.List;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
-@WebServlet({"/productoServlet", "/productos"})
-public class ProductoServlet extends HttpServlet {
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Connection conn = (Connection) request.getAttribute("conn");
-        ProductoService service = new ProductoServiceJdbcImplement(conn);
-        List<Producto> productos = service.listar();
-
-        LoginService auth = new LoginServiceImplement();
-        Optional<String> usernameOptional = auth.getUsername(request);
-        request.setAttribute("productos", productos);
-        request.setAttribute("username", usernameOptional);
-
-        request.getRequestDispatcher("/producto.jsp").forward(request, response);
-    }
+@WebServlet("/agregarProducto")
+public class AgregarProductoServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Obtener la conexión de la solicitud
         Connection conn = (Connection) request.getAttribute("conn");
+
+        // Inicializar el servicio de productos con la conexión
         ProductoService service = new ProductoServiceJdbcImplement(conn);
 
         // Recuperar parámetros del formulario de creación de productos
@@ -47,7 +35,15 @@ public class ProductoServlet extends HttpServlet {
         int condicion = Integer.parseInt(request.getParameter("condicion"));
         double precio = Double.parseDouble(request.getParameter("precio"));
 
+        // Validación de campos
+        Map<String, String> errores = validarCampos(nombre, stock, idCategoria, descripcion, condicion, precio);
 
+        if (!errores.isEmpty()) {
+            // Si hay errores, devolver al formulario con mensajes de error
+            request.setAttribute("errores", errores);
+            request.getRequestDispatcher("/crearProducto.jsp").forward(request, response);
+            return;
+        }
 
         // Crear un objeto Producto con los datos del formulario
         Producto producto = new Producto();
@@ -55,6 +51,7 @@ public class ProductoServlet extends HttpServlet {
         producto.setNombre(nombre);
         producto.setStock(stock);
 
+        // Crear una instancia de la categoría y asignarle el ID
         Categoria categoria = new Categoria();
         categoria.setIdCategoria(idCategoria);
         producto.setCategoria(categoria);
@@ -69,5 +66,30 @@ public class ProductoServlet extends HttpServlet {
 
         // Redirigir de vuelta a la página de productos después de guardar
         response.sendRedirect(request.getContextPath() + "/productos");
+    }
+
+    private Map<String, String> validarCampos(String nombre, int stock, int idCategoria, String descripcion, int condicion, double precio) {
+        Map<String, String> errores = new HashMap<>();
+
+        if (nombre == null || nombre.isBlank()) {
+            errores.put("nombre", "El campo nombre es requerido.");
+        }
+        if (stock <= 0) {
+            errores.put("stock", "El campo stock debe ser mayor que cero.");
+        }
+        if (idCategoria <= 0) {
+            errores.put("categoria", "Debe seleccionar una categoría válida.");
+        }
+        if (descripcion == null || descripcion.isBlank()) {
+            errores.put("descripcion", "El campo descripción es requerido.");
+        }
+        if (condicion <= 0) {
+            errores.put("condicion", "El campo condición debe ser mayor que cero.");
+        }
+        if (precio <= 0) {
+            errores.put("precio", "El campo precio debe ser mayor que cero.");
+        }
+
+        return errores;
     }
 }
