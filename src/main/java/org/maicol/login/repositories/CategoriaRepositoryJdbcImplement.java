@@ -74,6 +74,11 @@ public class CategoriaRepositoryJdbcImplement implements Repository <Categoria> 
     }
 
     @Override
+    public void eliminar(int idProducto) throws SQLException {
+
+    }
+
+    @Override
     public Categoria activar(Integer id) {
         return null;
     }
@@ -81,6 +86,11 @@ public class CategoriaRepositoryJdbcImplement implements Repository <Categoria> 
     @Override
     public Categoria desactivar(Integer id) {
         return null;
+    }
+
+    @Override
+    public void actualizar(Categoria categoria) throws SQLException {
+
     }
 
     private Categoria getCategoria(ResultSet rs) throws SQLException{

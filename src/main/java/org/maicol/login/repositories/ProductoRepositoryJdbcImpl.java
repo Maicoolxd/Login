@@ -7,12 +7,13 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductoRepositoryJdbcImpl implements Repository<Producto>{
+public class ProductoRepositoryJdbcImpl implements Repository<Producto> {
     private Connection conn;
 
     public ProductoRepositoryJdbcImpl(Connection conn) {
         this.conn = conn;
     }
+
     public Connection getConnection() throws SQLException {
         return this.conn;
     }
@@ -20,9 +21,9 @@ public class ProductoRepositoryJdbcImpl implements Repository<Producto>{
     @Override
     public List<Producto> listar() throws SQLException {
         List<Producto> productos = new ArrayList<>();
-        try(Statement smt = conn.createStatement();
-                ResultSet rs = smt.executeQuery("SELECT *from articulo")){
-            while(rs.next()){
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM articulo")) {
+            while (rs.next()) {
                 Producto p = getProducto(rs);
                 productos.add(p);
             }
@@ -33,15 +34,13 @@ public class ProductoRepositoryJdbcImpl implements Repository<Producto>{
     @Override
     public Producto porId(Integer id) throws SQLException {
         Producto producto = null;
-        try (PreparedStatement smt = conn.prepareStatement(
-                "SELECT p.*, categoria.nombre \n" +
-                        "FROM articulo AS p \n" +
-                        "INNER JOIN categoria ON categoria.idcategoria = p.idcategoria \n" +
-                        "WHERE p.idarticulo = ?;\n")) {
-
-
-            smt.setInt(1, id);
-            try (ResultSet rs = smt.executeQuery()) {
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "SELECT p.*, categoria.nombre " +
+                        "FROM articulo AS p " +
+                        "INNER JOIN categoria ON categoria.idcategoria = p.idcategoria " +
+                        "WHERE p.idarticulo = ?")) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     producto = getProducto(rs);
                 }
@@ -95,15 +94,50 @@ public class ProductoRepositoryJdbcImpl implements Repository<Producto>{
     }
 
 
-    @Override
-    public void eliminar(Integer id) throws SQLException {
-        String sql = "delete from articulo WHERE idarticulo=?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)){
-            stmt.setInt(1,id);
-            stmt.executeUpdate();
 
+    @Override
+    public void eliminar(int idProducto) throws SQLException {
+
+    }
+
+    @Override
+    public void actualizar(Producto producto) throws SQLException {
+        String sql = "UPDATE articulo SET codigo = ?, nombre = ?, stock = ?, idcategoria = ?, descripcion = ?, imagen = ?, condicion = ?, precio = ? WHERE idarticulo = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, producto.getCodigo());
+            stmt.setString(2, producto.getNombre());
+            stmt.setInt(3, producto.getStock());
+            stmt.setInt(4, producto.getCategoria().getIdCategoria());
+            stmt.setString(5, producto.getDescripcion());
+            stmt.setString(6, producto.getImagen());
+            stmt.setInt(7, producto.getCondicion());
+            stmt.setDouble(8, producto.getPrecio());
+            stmt.setInt(9, producto.getIdProducto());
+            stmt.executeUpdate();
         }
     }
+
+    /*@Override
+    public void eliminar(Integer id) throws SQLException {
+        String sql = "DELETE FROM articulo WHERE idarticulo = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        }
+    }*/
+
+    @Override
+    public void eliminar(Integer id) throws SQLException {
+        String sql = "DELETE FROM articulo WHERE idarticulo = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            int filasAfectadas = pstmt.executeUpdate();
+            if (filasAfectadas == 0) {
+                throw new SQLException("No se encontró ningún producto con idarticulo: " + id);
+            }
+        }
+    }
+
 
     @Override
     public Producto activar(Integer id) {
@@ -133,5 +167,4 @@ public class ProductoRepositoryJdbcImpl implements Repository<Producto>{
 
         return p;
     }
-
 }

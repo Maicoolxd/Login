@@ -7,6 +7,7 @@ import org.maicol.login.repositories.ProductoRepositoryJdbcImpl;
 import org.maicol.login.repositories.Repository;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +42,12 @@ public class ProductoServiceImplement implements ProductoService {
     }
 
     @Override
-    public void eliminar(Integer id) {
+    public void actualizar(Producto producto) throws SQLException {
+
+    }
+
+    @Override
+    public void eliminar(Integer id) throws SQLException {
 
     }
 

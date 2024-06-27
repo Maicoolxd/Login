@@ -5,10 +5,8 @@ import org.maicol.login.models.Producto;
 import org.maicol.login.repositories.CategoriaRepositoryJdbcImplement;
 import org.maicol.login.repositories.ProductoRepositoryJdbcImpl;
 import org.maicol.login.repositories.Repository;
-import org.maicol.login.services.ServiceJdbcException;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +14,7 @@ import java.util.Optional;
 public class ProductoServiceJdbcImplement implements ProductoService {
     private Repository<Producto> repositoryJdbc;
     private Repository<Categoria> categoriaRepositoryJdbc;
+
 
     public ProductoServiceJdbcImplement(Connection connection) {
         this.repositoryJdbc = new ProductoRepositoryJdbcImpl(connection);
@@ -50,8 +49,17 @@ public class ProductoServiceJdbcImplement implements ProductoService {
     }
 
     @Override
-    public void eliminar(Integer id) {
-        // Implementar la lógica para eliminar un producto por su ID
+    public void actualizar(Producto producto) throws SQLException {
+        repositoryJdbc.actualizar(producto);
+    }
+
+    @Override
+    public void eliminar(Integer idProducto) {
+        try {
+            repositoryJdbc.eliminar(idProducto);
+        } catch (SQLException throwables) {
+            throw new ServiceJdbcException("Error al eliminar producto", throwables);
+        }
     }
 
     @Override

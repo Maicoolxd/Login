@@ -70,7 +70,8 @@
             <td><%= p.getPrecio() %></td>
             <td><a href="<%= request.getContextPath() %>/agregar-carro?id=<%= p.getIdProducto() %>">agregar al carro</a>
             <a href="<%= request.getContextPath() %>/editarProducto.jsp?id=<%= p.getIdProducto() %>">Editar</a>
-            <a href="<%= request.getContextPath() %>/EliminarProductoServlet?id=<%= p.getIdProducto() %>">Eliminar</a></td>
+                <a href="<%= request.getContextPath() %>/eliminarProducto?id=<%= p.getIdProducto() %>" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?')">Eliminar</a>
+            </td>
             <% } %>
         </tr>
         <% } %>

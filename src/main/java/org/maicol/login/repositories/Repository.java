@@ -14,6 +14,12 @@ public interface Repository <T>{
     T porId(Integer id) throws SQLException;
     void guardar(T t) throws SQLException;
     void eliminar(Integer id) throws SQLException;
+
+    void eliminar(int idProducto) throws SQLException;
+
     T activar(Integer id);
     T desactivar(Integer id);
+
+    void actualizar(T t) throws SQLException; // Nuevo método agregado
+
 }
