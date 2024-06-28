@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.maicol.login.models.Categoria;
 import org.maicol.login.models.Producto;
 import org.maicol.login.services.ProductoService;
@@ -19,7 +20,20 @@ import java.util.Map;
 @WebServlet("/EditarProducto")
 public class EditarProductoServlet extends HttpServlet {
 
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Obtener la sesión actual
+        HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role");
+
+        // Verificar si el usuario es administrador o no
+        if (!"ADMIN".equals(role)) {
+            // Si el usuario no es administrador entonces debe mostrar un mensaje de error
+            response.setContentType("text/html;charset=UTF-8");
+            response.getWriter().write("No tienes permisos para editar un producto.");
+            return;
+        }
+
         // Obtener la conexión de la solicitud
         Connection conn = (Connection) request.getAttribute("conn");
 
@@ -99,4 +113,5 @@ public class EditarProductoServlet extends HttpServlet {
 
         return errores;
     }
+
 }

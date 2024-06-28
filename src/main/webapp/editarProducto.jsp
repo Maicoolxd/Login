@@ -1,8 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" import="org.maicol.login.models.*" %>
-<%@ page import="java.sql.Connection" %>
-<%@ page import="org.maicol.login.repositories.ProductoRepositoryJdbcImpl" %>
-<%@ page import="org.maicol.login.models.Producto" %>
-
+<%@ page contentType="text/html;charset=UTF-8" language="java" import="org.maicol.login.models.*, org.maicol.login.repositories.ProductoRepositoryJdbcImpl, java.sql.Connection" %>
 <%
     int id = Integer.parseInt(request.getParameter("id"));
     Connection conn = (Connection) request.getAttribute("conn");
@@ -23,6 +19,74 @@
 <head>
     <meta charset="UTF-8">
     <title>Editar Producto</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h3 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        div {
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 400px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #28a745; /* Verde */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 3px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 20px;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838; /* Verde oscuro al pasar el cursor */
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a.red {
+            background-color: #dc3545; /* Rojo */
+            color: white;
+        }
+        a.red:hover {
+            background-color: #c82333; /* Rojo oscuro al pasar el cursor */
+        }
+    </style>
 </head>
 <body>
 <h3>Editar Producto</h3>
@@ -64,5 +128,8 @@
         <input type="submit" value="Guardar Cambios">
     </div>
 </form>
+
+<a href="<%= request.getContextPath() %>/index.html" class="red">Regresar</a>
+
 </body>
 </html>

@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.maicol.login.models.Categoria;
 import org.maicol.login.models.Producto;
 import org.maicol.login.services.ProductoService;
@@ -18,7 +19,32 @@ import java.util.Map;
 @WebServlet("/agregarProducto")
 public class AgregarProductoServlet extends HttpServlet {
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role");
+
+        if (!"ADMIN".equals(role)) {
+            response.setContentType("text/html;charset=UTF-8");
+            response.getWriter().write("No tienes permisos para agregar un nuevo producto.");
+            return;
+        }
+
+        // Redirigir al formulario de producto
+        request.getRequestDispatcher("/producto.jsp").forward(request, response);
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role");
+
+        // Verificar si el usuario es administrador o no
+        if (!"ADMIN".equals(role)) {
+            response.setContentType("text/html;charset=UTF-8");
+            // Si el usuario no es administrador entonces debe mostrar un mensaje de error
+            response.getWriter().write("No tienes permisos para agregar un nuevo producto.");
+            return;
+        }
         // Obtener la conexión de la solicitud
         Connection conn = (Connection) request.getAttribute("conn");
 
