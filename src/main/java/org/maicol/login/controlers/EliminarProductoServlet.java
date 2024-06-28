@@ -17,19 +17,28 @@ import java.sql.SQLException;
 public class EliminarProductoServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         // Obtener la sesión actual
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
 
         // Verificar si el usuario es administrador
         if (!"ADMIN".equals(role)) {
-            // Si el usuario no es administrador, mostrar un mensaje de error
+            // Mostrar mensaje con estilo HTML
+            String errorMessage = "<html><head><title>Error de permisos</title>" +
+                    "<style>" +
+                    "body { background-color: black; color: white; text-align: center; font-size: 24px; }" +
+                    ".btn { background-color: red; color: white; padding: 10px 20px; text-decoration: none; }" +
+                    "</style></head>" +
+                    "<body>" +
+                    "<h1>No tienes permisos para eliminar un producto.</h1>" +
+                    "<a class='btn' href='" + request.getContextPath() + "/producto.jsp'>Regresar</a>" +
+                    "</body></html>";
             response.setContentType("text/html;charset=UTF-8");
-            response.getWriter().write("No tienes permisos para eliminar un producto.");
+            response.getWriter().write(errorMessage);
             return;
         }
 
+        // Si es administrador, continuar con el proceso de eliminar el producto
         // Obtener la conexión de la solicitud
         Connection conn = (Connection) request.getAttribute("conn");
 

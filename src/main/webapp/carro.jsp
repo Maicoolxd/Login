@@ -58,6 +58,7 @@
         }
         a.orange {
             background-color: #fd7e14; /* Naranja */
+            color: white; /* Color de texto blanco */
         }
         a.orange:hover {
             background-color: #e07612; /* Naranja oscuro al pasar el cursor */
@@ -84,7 +85,6 @@
             <th>PRECIO</th>
             <th>CANTIDAD</th>
             <th>SUBTOTAL</th>
-            <th>ACCIONES</th>
         </tr>
         <% for (ItemCarro item : carro.getItems()) { %>
         <tr>
@@ -93,26 +93,22 @@
                 <td><%= item.getProducto().getIdProducto() %></td>
                 <td><%= item.getProducto().getNombre() %></td>
                 <td><%= item.getProducto().getPrecio() %></td>
-                <td><%= item.getCantidad() %>"></td>
+                <td><input type="number" name="cantidad" value="<%= item.getCantidad() %>"></td>
                 <td><%= item.getImporte() %></td>
-                <td>
-                    <input type="submit" value="Actualizar" class="orange">
-                    <a href="<%= request.getContextPath() %>/EliminarDelCarroServlet?idProducto=<%= item.getProducto().getIdProducto() %>" class="red">Eliminar</a>
-                </td>
+
             </form>
         </tr>
         <% } %>
         <tr>
             <td colspan="4">Total:</td>
             <td><%= carro.getTotal() %></td>
-            <td></td> <!-- Celda vacía para alinear con la columna de acciones -->
         </tr>
     </table>
     <% } %>
 
     <p>
         <a href="<%= request.getContextPath() %>/productos" class="green">Seguir comprando</a>
-        <a href="<%= request.getContextPath() %>/index.html" class="red">Volver</a>
+        <a href="<%= request.getContextPath() %>/index.html" class="red">Volver al carrito</a>
     </p>
 </div>
 </body>

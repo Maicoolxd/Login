@@ -17,9 +17,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet("/EditarProducto")
+@WebServlet("/editarProducto")
 public class EditarProductoServlet extends HttpServlet {
-
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Obtener la sesión actual
@@ -28,12 +27,22 @@ public class EditarProductoServlet extends HttpServlet {
 
         // Verificar si el usuario es administrador o no
         if (!"ADMIN".equals(role)) {
-            // Si el usuario no es administrador entonces debe mostrar un mensaje de error
+            // Mostrar mensaje con estilo HTML
+            String errorMessage = "<html><head><title>Error de permisos</title>" +
+                    "<style>" +
+                    "body { background-color: black; color: white; text-align: center; font-size: 24px; }" +
+                    ".btn { background-color: red; color: white; padding: 10px 20px; text-decoration: none; }" +
+                    "</style></head>" +
+                    "<body>" +
+                    "<h1>No tienes permisos para editar un producto.</h1>" +
+                    "<a class='btn' href='" + request.getContextPath() + "/producto.jsp'>Regresar</a>" +
+                    "</body></html>";
             response.setContentType("text/html;charset=UTF-8");
-            response.getWriter().write("No tienes permisos para editar un producto.");
+            response.getWriter().write(errorMessage);
             return;
         }
 
+        // Si es administrador, continuar con el proceso de editar el producto
         // Obtener la conexión de la solicitud
         Connection conn = (Connection) request.getAttribute("conn");
 
@@ -85,8 +94,8 @@ public class EditarProductoServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
 
-        // Redirigir de vuelta a la página de productos después de guardar
-        response.sendRedirect(request.getContextPath() + "/productos");
+        // Redirigir de vuelta a la página de producto.jsp después de guardar
+        response.sendRedirect(request.getContextPath() + "/producto.jsp");
     }
 
     private Map<String, String> validarCampos(String nombre, int stock, int idCategoria, String descripcion, int condicion, double precio) {
@@ -113,5 +122,4 @@ public class EditarProductoServlet extends HttpServlet {
 
         return errores;
     }
-
 }

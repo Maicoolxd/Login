@@ -90,7 +90,7 @@
 </head>
 <body>
 <h3>Editar Producto</h3>
-<form action="<%= request.getContextPath() %>/EditarProducto" method="post">
+<form action="<%= request.getContextPath() %>/editarProducto" method="post">
     <input type="hidden" name="id" value="<%= producto.getIdProducto() %>">
     <div>
         <label for="codigo">Código:</label>

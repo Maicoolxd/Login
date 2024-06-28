@@ -19,32 +19,28 @@ import java.util.Map;
 @WebServlet("/agregarProducto")
 public class AgregarProductoServlet extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        String role = (String) session.getAttribute("role");
-
-        if (!"ADMIN".equals(role)) {
-            response.setContentType("text/html;charset=UTF-8");
-            response.getWriter().write("No tienes permisos para agregar un nuevo producto.");
-            return;
-        }
-
-        // Redirigir al formulario de producto
-        request.getRequestDispatcher("/producto.jsp").forward(request, response);
-    }
-
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
 
         // Verificar si el usuario es administrador o no
         if (!"ADMIN".equals(role)) {
+            // Mostrar mensaje con estilo HTML
+            String errorMessage = "<html><head><title>Error de permisos</title>" +
+                    "<style>" +
+                    "body { background-color: black; color: white; text-align: center; font-size: 24px; }" +
+                    ".btn { background-color: red; color: white; padding: 10px 20px; text-decoration: none; }" +
+                    "</style></head>" +
+                    "<body>" +
+                    "<h1>No tienes permisos para agregar un nuevo producto.</h1>" +
+                    "<a class='btn' href='" + request.getContextPath() + "/producto.jsp'>Regresar</a>" +
+                    "</body></html>";
             response.setContentType("text/html;charset=UTF-8");
-            // Si el usuario no es administrador entonces debe mostrar un mensaje de error
-            response.getWriter().write("No tienes permisos para agregar un nuevo producto.");
+            response.getWriter().write(errorMessage);
             return;
         }
+
+        // Si es administrador, continuar con el proceso de agregar el producto
         // Obtener la conexión de la solicitud
         Connection conn = (Connection) request.getAttribute("conn");
 
@@ -90,8 +86,8 @@ public class AgregarProductoServlet extends HttpServlet {
         // Guardar el producto usando el servicio
         service.guardar(producto);
 
-        // Redirigir de vuelta a la página de productos después de guardar
-        response.sendRedirect(request.getContextPath() + "/productos");
+        // Redirigir de vuelta a la página de producto.jsp después de guardar
+        response.sendRedirect(request.getContextPath() + "/producto.jsp");
     }
 
     private Map<String, String> validarCampos(String nombre, int stock, int idCategoria, String descripcion, int condicion, double precio) {

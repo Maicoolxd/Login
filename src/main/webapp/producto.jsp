@@ -122,11 +122,13 @@
 <div class="container">
     <h3>Carrito de adidas</h3>
     <ul>
-        <input type="button" value="Regresar" class="btn-back" onclick="window.history.back()"/>
+        <a href="<%= request.getContextPath() %>/index.html" class="btn-back">Regresar</a>
+
     </ul>
 
+
     <% if (usernameOptional.isPresent()) { %>
-    <div style="color: blue;">Hola <%= usernameOptional.get() %>, Bienvenido</div>
+    <div style="color: white;">Hola <%= usernameOptional.get() %>, Bienvenido</div>
     <p><a class="button btn-new-product" href="<%= request.getContextPath() %>/crearProducto.jsp">Nuevo Producto</a></p>
     <% } %>
 

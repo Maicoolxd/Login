@@ -54,7 +54,7 @@
         }
         h3 {
             text-align: center;
-            color: #007bff;
+            color: white;
             margin-bottom: 20px;
         }
         form div {
